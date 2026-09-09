@@ -16,25 +16,31 @@ fun increment(a: Int): Int {
 }
 """
 
+_RUBY = "def increment(a) = a + 1"
+
 
 def test_scans_all_supported_languages(tmp_path: Path):
     (tmp_path / "Calculator.java").write_text(_JAVA)
     (tmp_path / "Increment.kt").write_text(_KOTLIN)
+    (tmp_path / "Increment.rb").write_text(_RUBY)
 
     scanned = set(scan_directory(tmp_path, exclude=[]))
 
-    assert scanned == {"Calculator.java", "Increment.kt"}
+    assert scanned == {"Calculator.java", "Increment.kt", "Increment.rb"}
 
 
 def test_parses_units_from_each_language(tmp_path: Path):
     (tmp_path / "Calculator.java").write_text(_JAVA)
     (tmp_path / "Increment.kt").write_text(_KOTLIN)
+    (tmp_path / "Increment.rb").write_text(_RUBY)
 
     java_units = parse_file(tmp_path / "Calculator.java")
     kotlin_units = parse_file(tmp_path / "Increment.kt")
+    ruby_units = parse_file(tmp_path / "Increment.rb")
 
     assert [u.name for u in java_units] == ["increment"]
     assert [u.name for u in kotlin_units] == ["increment"]
+    assert [u.name for u in ruby_units] == ["increment"]
 
 
 def test_recurses_into_subdirectories_with_paths_relative_to_root(tmp_path: Path):
